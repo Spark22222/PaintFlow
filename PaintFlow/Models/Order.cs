@@ -2,18 +2,18 @@ namespace PaintFlow.Models;
 
 public class Order
 {
-    public readonly DateTime CreatedAt { get; }
+    public DateTime CreatedAt { get; }
 
-    public PaintProduct Product { get; set; }
+    public PaintProduct[] Products { get; set; }
 
-    public int Quantity { get; set; }
+    public int[] Quantity { get; set; }
 
     public decimal TotalPrice { get; set; }
 
-    public void Order(PaintProduct product,int quantity)
+    public Order(PaintProduct[] product, int[] quantity)
     {
         CreatedAt = DateTime.Now;
-        Product = product;
+        Products = product;
         Quantity = quantity;
         TotalPrice = GetTotalOrderPrice();
     }
@@ -24,19 +24,27 @@ public class Order
         Console.WriteLine("-------------");
         Console.WriteLine($"Created At: {CreatedAt}");
         Console.WriteLine();
-        Console.WriteLine($"Product: {Product}");
-        Console.WriteLine($"Quantity: {Quantity}");
-        Console.WriteLine($"Unit Final Price: ${Product.GetFinalPrice():F2}");
-        Console.WriteLine($"Subtotal: ${Product.GetFinalPrice() * Quantity:F2}");
-        Console.WriteLine();
+        
+        for (int i = 0; i < Products.Length; i++)
+        {
+            Console.WriteLine($"Product: {Products[i].Name}");
+            Console.WriteLine($"Quantity: {Quantity[i]}");
+            Console.WriteLine($"Unit Final Price: ${Products[i].GetFinalPrice():F2}");
+            Console.WriteLine($"Subtotal: ${Products[i].GetFinalPrice() * Quantity[i]:F2}");
+            Console.WriteLine();
+        }
+        
         Console.WriteLine($"Total Order Price: ${TotalPrice:F2}");
     }
 
     public decimal GetTotalOrderPrice()
     {
         decimal total = 0;
-
-        total += Product.GetFinalPrice() * Quantity;
+        for (int i = 0; i < Products.Length; i++)
+        {
+            total += Products[i].GetFinalPrice() * Quantity[i];
+        }
+        
         return total;
     }
 }

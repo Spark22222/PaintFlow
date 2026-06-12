@@ -2,22 +2,26 @@ using PaintFlow.Interfaces;
 using PaintFlow.Enums;
 namespace PaintFlow.Models;
 
-public class PainProduct : Ibuyable
+public class PaintProduct : IBuyable
 {
     private readonly decimal TaxRate;
 
-    private const int DefaultDiscount = 0.05;
+    private const int DefaultDiscount = 5;
 
     public string Name { get; set; }
+
+    public Brand Brand { get; set; }
+
     public PaintType Type { get; set; }
 
     public PaintSpecification Specification { get; set; }
 
     public decimal Price { get; set; }
 
-    public PainProduct(string name, PaintType type, PaintSpecification specification, decimal price, decimal taxRate = 0.10m)
+    public PaintProduct(string name, PaintType type,Brand brand, PaintSpecification specification, decimal price, decimal taxRate = 0.10m)
     {
         Name = name;
+        Brand = brand;
         Type = type;
         Specification = specification;
         Price = price;
@@ -26,7 +30,7 @@ public class PainProduct : Ibuyable
 
     public decimal GetFinalPrice()
     {
-        decimal discountAmount = Price * DefaultDiscount;
+        decimal discountAmount = Price * DefaultDiscount / 100;
         decimal priceAfterDiscount = Price - discountAmount;
         decimal taxAmount = priceAfterDiscount * TaxRate;
 
@@ -39,6 +43,7 @@ public class PainProduct : Ibuyable
         Console.WriteLine("Paint Product Information");
         Console.WriteLine("-------------------------");
         Console.WriteLine($"Name: {Name}");
+        Brand.DisplayBrand();
         Console.WriteLine($"Type: {Type}");
         Console.WriteLine($"Original Price: ${Price}");
         Console.WriteLine($"Tax Rate: {TaxRate:P0}");
