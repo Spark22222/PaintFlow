@@ -32,16 +32,21 @@ PaintProduct product3 = new PaintProduct(
     95m
 );
 
-PaintProduct[] products = { product1, product2, product3 };
+List<PaintProduct> products = new List<PaintProduct> { product1, product2, product3 };
 
 PaintStore store = new PaintStore(products);
 
 store.DisplayAvailableProducts();
 
-PaintProduct[] orderProducts = { product1, product2 };
-int[] quantities = { 2, 3 };
+List<PaintProduct> orderProducts = new List<PaintProduct> { product1, product2 };
+List<int> quantities = new List<int> { 2, 3 };
 
 Order order = new Order(orderProducts, quantities);
+foreach (var product in order.GetMostExpensivePaintProduct())
+{
+     Console.WriteLine($"{product.Name} - ${product.Price:F2}");
+}
+
 
 Console.WriteLine();
 order.DisplayOrder();
