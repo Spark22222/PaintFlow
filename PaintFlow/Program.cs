@@ -50,3 +50,48 @@ foreach (var product in order.GetMostExpensivePaintProduct())
 
 Console.WriteLine();
 order.DisplayOrder();
+
+
+User user = new User(1, "Jessi");
+
+user.AddOrder(order);
+
+Payment payment1 = new Payment(
+    1,
+    order,
+    PaymentStatus.Success,
+    order.TotalPrice,
+    PaymentMethod.CreditCard,
+    user
+);
+
+user.AddPayment(payment1);
+
+Order? highestOrder = user.GetHighestAmountOrder();
+
+if (highestOrder != null)
+{
+    Console.WriteLine(
+        $"Highest order amount: ${highestOrder.TotalPrice:F2}"
+    );
+}
+
+Payment? latestPayment = user.GetLatestPayment();
+
+if (latestPayment != null)
+{
+    Console.WriteLine(
+        $"Latest payment amount: ${latestPayment.PaymentAmount:F2}"
+    );
+}
+
+List<Payment> paymentsAboveTen =
+    user.GetPaymentsAbove(10m);
+
+foreach (Payment payment in paymentsAboveTen)
+{
+    Console.WriteLine(
+        $"Payment ID: {payment.PaymentId}, " +
+        $"Amount: ${payment.PaymentAmount:F2}"
+    );
+}
