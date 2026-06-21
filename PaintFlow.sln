@@ -1,8 +1,12 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintFlow", "PaintFlow\PaintFlow.csproj", "{22A2D5ED-EBA3-4FC5-0123-0DBB23256B6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintStore.Model", "PaintStore.Model\PaintStore.Model.csproj", "{A01DB5A6-4932-4674-B204-FC904420AC55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintStore.API", "PaintStore.API\PaintStore.API.csproj", "{6270291B-CD81-442A-9115-DA0E5D631AD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +18,14 @@ Global
 		{22A2D5ED-EBA3-4FC5-0123-0DBB23256B6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22A2D5ED-EBA3-4FC5-0123-0DBB23256B6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22A2D5ED-EBA3-4FC5-0123-0DBB23256B6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01DB5A6-4932-4674-B204-FC904420AC55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01DB5A6-4932-4674-B204-FC904420AC55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01DB5A6-4932-4674-B204-FC904420AC55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01DB5A6-4932-4674-B204-FC904420AC55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6270291B-CD81-442A-9115-DA0E5D631AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6270291B-CD81-442A-9115-DA0E5D631AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6270291B-CD81-442A-9115-DA0E5D631AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6270291B-CD81-442A-9115-DA0E5D631AD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
