@@ -41,6 +41,13 @@ public static class FakeData
         }
     };
 
+    public static List<User> Users { get; } = new List<User>
+    {
+        new User(101, "Jessi", "jessi@example.com"),
+        new User(102, "Alex", "alex@example.com"),
+        new User(103, "Mia", "mia@example.com")
+    };
+
     public static List<Order> Orders { get; } = new List<Order>
     {
         new Order(
@@ -89,4 +96,17 @@ public static class FakeData
             DateTime.Today.AddMonths(-1).AddDays(2)
         )
     };
+
+    static FakeData()
+    {
+        foreach (Order order in Orders)
+        {
+            User? user = Users.FirstOrDefault(u => u.UserId == order.UserId);
+
+            if (user != null)
+            {
+                user.AddOrder(order);
+            }
+        }
+    }
 }
