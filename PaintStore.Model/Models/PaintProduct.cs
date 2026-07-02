@@ -30,6 +30,12 @@ public class PaintProduct : IBuyable
         TaxRate = taxRate;
     }
 
+    public PaintProduct()
+    {
+        Brand = new Brand();
+        Specification = new PaintSpecification();
+    }
+
     public decimal GetFinalPrice()
     {
         decimal discountAmount = Price * DefaultDiscount / 100;

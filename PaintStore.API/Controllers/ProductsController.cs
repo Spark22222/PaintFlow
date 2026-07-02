@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaintStore.API.Data;
 using PaintStore.Model.Models;
 
@@ -8,8 +9,15 @@ namespace PaintStore.API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
+    private readonly PaintStoreDbContext _context;
+
+    public ProductsController(PaintStoreDbContext context)
+    {
+        _context = context;
+    }
+
     [HttpGet]
-    public ActionResult<List<PaintProduct>> GetAllPaintProducts(
+    public async Task<ActionResult<List<PaintProduct>>> GetAllPaintProducts(
         int page = 1,
         int pageSize = 10)
     {
@@ -18,16 +26,16 @@ public class ProductsController : ControllerBase
             return BadRequest("Page and pageSize must be greater than zero.");
         }
 
-        List<PaintProduct> products = FakeData.Products
+        List<PaintProduct> products = await _context.PaintProducts
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
 
         return Ok(products);
     }
 
     [HttpGet("price-range")]
-    public ActionResult<List<PaintProduct>> GetProductsByPriceRange(
+    public async Task<ActionResult<List<PaintProduct>>> GetProductsByPriceRange(
         decimal min,
         decimal max)
     {
@@ -36,20 +44,21 @@ public class ProductsController : ControllerBase
             return BadRequest("Min price cannot be greater than max price.");
         }
 
-        List<PaintProduct> products = FakeData.Products
+        List<PaintProduct> products = await _context.PaintProducts
             .Where(product =>
                 product.Price >= min &&
                 product.Price <= max)
-            .ToList();
+            .ToListAsync();
 
         return Ok(products);
     }
 
     [HttpGet("{paintId:int}")]
-    public ActionResult<PaintProduct> GetPaintProductByPaintId(int paintId)
+    public async Task<ActionResult<PaintProduct>> GetPaintProductByPaintId(
+        int paintId)
     {
-        PaintProduct? product = FakeData.Products
-            .FirstOrDefault(product => product.Id == paintId);
+        PaintProduct? product = await _context.PaintProducts
+            .FirstOrDefaultAsync(product => product.Id == paintId);
 
         if (product == null)
         {
@@ -60,19 +69,27 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("user/{userId:int}")]
-    public ActionResult<List<PaintProduct>> GetPaintProductsByUserId(int userId)
+    public async Task<ActionResult<List<PaintProduct>>> GetPaintProductsByUserId(
+        int userId)
     {
-        bool userExists = FakeData.Users
-            .Any(user => user.UserId == userId);
+        bool userExists = await _context.Users
+            .AnyAsync(user => user.UserId == userId);
 
         if (!userExists)
         {
             return NotFound($"User with id {userId} was not found.");
         }
 
-        List<PaintProduct> products = FakeData.Orders
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
             .Where(order => order.UserId == userId)
-            .SelectMany(order => order.Products)
+            .ToListAsync();
+
+        List<PaintProduct> products = orders
+            .SelectMany(order => order.OrderItems)
+            .Where(item => item.PaintProduct != null)
+            .Select(item => item.PaintProduct!)
             .DistinctBy(product => product.Id)
             .ToList();
 
