@@ -4,22 +4,23 @@ public class User
 {
     public int UserId { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
-    public List<Order> OrderHistory { get; set; }
+    public List<Order> OrderHistory { get; set; } = new List<Order>();
 
-    public List<Payment> PaymentHistory { get; set; }
+    public List<Payment> PaymentHistory { get; set; } = new List<Payment>();
+
+    public User()
+    {
+    }
 
     public User(int userId, string name, string email = "")
     {
         UserId = userId;
         Name = name;
         Email = email;
-
-        OrderHistory = new List<Order>();
-        PaymentHistory = new List<Payment>();
     }
 
     public void AddOrder(Order order)

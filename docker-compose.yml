@@ -1,0 +1,14 @@
+services:
+  paintstore-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: paintstore-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong!Passw0rd"
+    ports:
+      - "1434:1433"
+    volumes:
+      - paintstore_sql_data:/var/opt/mssql
+
+volumes:
+  paintstore_sql_data:

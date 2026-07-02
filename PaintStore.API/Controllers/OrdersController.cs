@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaintStore.API.Data;
 using PaintStore.Model.Models;
 
@@ -8,69 +9,118 @@ namespace PaintStore.API.Controllers;
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase
 {
+    private readonly PaintStoreDbContext _context;
+
+    public OrdersController(PaintStoreDbContext context)
+    {
+        _context = context;
+    }
+
     [HttpGet]
-    public ActionResult<List<Order>> GetAllOrders(int page = 1,int pageSize = 10)
+    public async Task<ActionResult<List<Order>>> GetAllOrders(
+        int page = 1,
+        int pageSize = 10)
     {
         if (page <= 0 || pageSize <= 0)
         {
             return BadRequest("Page and pageSize must be greater than zero.");
         }
 
-        List<Order> orders = FakeData.Orders.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
 
         return Ok(orders);
     }
 
     [HttpGet("price-range")]
-     public ActionResult<List<Order>> GetOrdersByPriceRange(decimal min,decimal max)
+    public async Task<ActionResult<List<Order>>> GetOrdersByPriceRange(
+        decimal min,
+        decimal max)
     {
         if (min > max)
         {
             return BadRequest("Min price cannot be greater than max price.");
         }
 
-        List<Order> orders = FakeData.Orders.Where(order => order.TotalPrice >= min && order.TotalPrice <= max).ToList();
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
+            .Where(order =>
+                order.TotalPrice >= min &&
+                order.TotalPrice <= max)
+            .ToListAsync();
 
         return Ok(orders);
     }
 
-    [HttpGet("paint/{paintId}")]
-    public ActionResult<List<Order>> GetOrdersByPaintId(int paintId)
+    [HttpGet("paint/{paintId:int}")]
+    public async Task<ActionResult<List<Order>>> GetOrdersByPaintId(int paintId)
     {
-        List<Order> orders = FakeData.Orders.Where(order => order.Products.Any(product => product.Id == paintId)).ToList();
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
+            .Where(order =>
+                order.OrderItems.Any(item =>
+                    item.PaintProductId == paintId))
+            .ToListAsync();
 
         return Ok(orders);
     }
 
-        [HttpGet("user/{userId}")]
-    public ActionResult<List<Order>> GetOrdersByUserId(int userId)
+    [HttpGet("user/{userId:int}")]
+    public async Task<ActionResult<List<Order>>> GetOrdersByUserId(int userId)
     {
-        List<Order> orders = FakeData.Orders
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
             .Where(order => order.UserId == userId)
-            .ToList();
+            .ToListAsync();
 
         return Ok(orders);
     }
 
     [HttpGet("last-month")]
-    public ActionResult<List<Order>> GetLastMonthOrders()
+    public async Task<ActionResult<List<Order>>> GetLastMonthOrders()
     {
         DateTime today = DateTime.Today;
-        DateTime firstDayOfThisMonth = new DateTime(today.Year, today.Month, 1);
-        DateTime firstDayOfLastMonth = firstDayOfThisMonth.AddMonths(-1);
-        DateTime lastDayOfLastMonth = firstDayOfThisMonth.AddDays(-1);
+        DateTime firstDayOfThisMonth =
+            new DateTime(today.Year, today.Month, 1);
 
-        List<Order> orders = FakeData.Orders.Where(order => order.CreatedAt.Date >= firstDayOfLastMonth && order.CreatedAt.Date <= lastDayOfLastMonth).ToList();
+        DateTime firstDayOfLastMonth =
+            firstDayOfThisMonth.AddMonths(-1);
+
+        DateTime firstDayOfThisMonthStart =
+            firstDayOfThisMonth;
+
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
+            .Where(order =>
+                order.CreatedAt >= firstDayOfLastMonth &&
+                order.CreatedAt < firstDayOfThisMonthStart)
+            .ToListAsync();
 
         return Ok(orders);
     }
 
     [HttpGet("date")]
-    public ActionResult<List<Order>> GetOrdersByDate(DateTime date)
+    public async Task<ActionResult<List<Order>>> GetOrdersByDate(DateTime date)
     {
-        List<Order> orders = FakeData.Orders.Where(order => order.CreatedAt.Date == date).ToList();
+        DateTime start = date.Date;
+        DateTime end = start.AddDays(1);
+
+        List<Order> orders = await _context.Orders
+            .Include(order => order.OrderItems)
+            .ThenInclude(item => item.PaintProduct)
+            .Where(order =>
+                order.CreatedAt >= start &&
+                order.CreatedAt < end)
+            .ToListAsync();
 
         return Ok(orders);
     }
-
 }

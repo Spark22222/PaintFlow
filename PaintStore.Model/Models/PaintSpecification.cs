@@ -2,10 +2,16 @@ namespace PaintStore.Model.Models;
 
 public class PaintSpecification
 {
-    public string Color { get; set; }
+    public string Color { get; set; } = string.Empty;
+
     public int SizeInLiters { get; set; }
 
-    public PaintSpecification(string color, int sizeInLiters){
+    public PaintSpecification()
+    {
+    }
+
+    public PaintSpecification(string color, int sizeInLiters)
+    {
         Color = color;
         SizeInLiters = sizeInLiters;
     }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PaintStore.API.Data;
 using PaintStore.Model.Models;
 
@@ -8,8 +9,15 @@ namespace PaintStore.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+    private readonly PaintStoreDbContext _context;
+
+    public UsersController(PaintStoreDbContext context)
+    {
+        _context = context;
+    }
+
     [HttpGet]
-    public ActionResult<List<User>> GetUsers(
+    public async Task<ActionResult<List<User>>> GetUsers(
         int page = 1,
         int pageSize = 10)
     {
@@ -18,19 +26,19 @@ public class UsersController : ControllerBase
             return BadRequest("Page and pageSize must be greater than zero.");
         }
 
-        List<User> users = FakeData.Users
+        List<User> users = await _context.Users
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync();
 
         return Ok(users);
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<User> GetUserById(int id)
+    public async Task<ActionResult<User>> GetUserById(int id)
     {
-        User? user = FakeData.Users
-            .FirstOrDefault(user => user.UserId == id);
+        User? user = await _context.Users
+            .FirstOrDefaultAsync(user => user.UserId == id);
 
         if (user == null)
         {
@@ -41,30 +49,21 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("name/{name}")]
-    public ActionResult<List<User>> GetUserByName(string name)
+    public async Task<ActionResult<List<User>>> GetUserByName(string name)
     {
-        List<User> users = FakeData.Users
+        List<User> users = await _context.Users
             .Where(user =>
-                user.Name.Contains(
-                    name,
-                    StringComparison.OrdinalIgnoreCase
-                )
-            )
-            .ToList();
+                EF.Functions.Like(user.Name, $"%{name}%"))
+            .ToListAsync();
 
         return Ok(users);
     }
 
     [HttpGet("email")]
-    public ActionResult<User> GetUserByEmail(string email)
+    public async Task<ActionResult<User>> GetUserByEmail(string email)
     {
-        User? user = FakeData.Users
-            .FirstOrDefault(user =>
-                user.Email.Equals(
-                    email,
-                    StringComparison.OrdinalIgnoreCase
-                )
-            );
+        User? user = await _context.Users
+            .FirstOrDefaultAsync(user => user.Email == email);
 
         if (user == null)
         {
